@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SIV Lite — Extractor de Identidad</title>
+    <title>Iron Mountain — ID Verification Florida</title>
     
     <!-- Librerías Modernas y Estables (Locales) -->
     <script src="pdf.min.js"></script>
@@ -15,12 +15,12 @@
             src: local('Segoe UI'), local('Arial');
         }
         :root {
-            --bg: #020617;
-            --glass: rgba(15, 23, 42, 0.75);
-            --border: rgba(255, 255, 255, 0.1);
-            --primary: #6366f1;
-            --secondary: #ec4899;
-            --text: #f1f5f9;
+            --bg: #0b1121;
+            --glass: rgba(15, 23, 42, 0.85);
+            --border: rgba(255, 255, 255, 0.08);
+            --primary: #1C75BC; /* Iron Mountain Denim */
+            --secondary: #666666; /* Iron Mountain Gray */
+            --text: #ffffff;
             --dim: #94a3b8;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -33,8 +33,8 @@
             align-items: center; justify-content: center;
             padding: 20px;
             background-image: 
-                radial-gradient(at 0% 0%, #1e1b4b 0, transparent 50%), 
-                radial-gradient(at 100% 100%, #4c1d95 0, transparent 50%);
+                radial-gradient(at 0% 0%, #0f172a 0, transparent 50%), 
+                radial-gradient(at 100% 100%, #1e3a8a 0, transparent 50%);
         }
         .app-card {
             width: 100%; max-width: 480px;
@@ -50,11 +50,11 @@
         @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } }
         
         h1 {
-            font-size: 2rem; font-weight: 800; text-align: center; margin-bottom: 6px;
-            background: linear-gradient(to right, #a5b4fc, #f9a8d4);
-            -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+            font-size: 1.8rem; font-weight: 800; text-align: center; margin-bottom: 6px;
+            color: #fff;
+            letter-spacing: -0.02em;
         }
-        .tagline { text-align: center; color: var(--dim); font-size: 0.9rem; margin-bottom: 35px; }
+        .tagline { text-align: center; color: var(--primary); font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 35px; }
 
         .upload-container {
             position: relative;
@@ -82,10 +82,10 @@
 
         .btn {
             width: 100%; padding: 18px; border: none; border-radius: 20px;
-            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            background: var(--primary);
             color: white; font-weight: 700; font-size: 1.1rem;
             cursor: pointer; transition: 0.3s;
-            box-shadow: 0 10px 20px -5px rgba(99, 102, 241, 0.4);
+            box-shadow: 0 10px 20px -5px rgba(28, 117, 188, 0.4);
             display: none;
         }
         .btn:hover { transform: scale(1.02); box-shadow: 0 15px 25px -10px rgba(99, 102, 241, 0.5); }
@@ -110,7 +110,7 @@
         }
         .label { font-size: 0.65rem; font-weight: 800; color: var(--dim); text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 4px; }
         .value { font-size: 1.25rem; font-weight: 700; color: #fff; }
-        .cc-val { color: #818cf8; font-family: 'Monaco', monospace; font-size: 1.5rem; }
+        .cc-val { color: var(--primary); font-family: 'Monaco', monospace; font-size: 1.5rem; }
 
         input[type="file"] { display: none; }
     </style>
@@ -118,8 +118,8 @@
 <body>
 
 <div class="app-card">
-    <h1>SIV Lite</h1>
-    <p class="tagline">Verificación Inteligente de Identidad</p>
+    <h1>Iron Mountain</h1>
+    <p class="tagline">Florida — Identity Verification</p>
 
     <div id="mainUI">
         <label class="label">Carga Inteligente de Documentos</label>

@@ -87,14 +87,9 @@
             if (match) idIndex = parseInt(match[0]);
 
             if (idIndex < 0 || idIndex >= fileDataList.length) {
-                idIndex = fileDataList.findIndex(f => {
-                    const t = f.text.toUpperCase();
-                    return t.includes("REPUBLICA") || t.includes("COLOMBIA") || t.includes("CEDULA") || t.includes("NOMBRES");
-                });
-            }
-            
-            if (idIndex < 0 || idIndex >= fileDataList.length) {
-                throw new Error("No pudimos identificar cuál de los archivos es la Cédula. Asegúrate de que la foto sea clara.");
+                // RECHAZO AUTOMÁTICO: No se detectó ninguna cédula
+                renderFinalReport({ nombres: "RECHAZADO", apellidos: "CÉDULA NO DETECTADA", cedula: "0" }, [], true);
+                return;
             }
 
             const activeIDText = fileDataList[idIndex].text;
@@ -176,14 +171,22 @@
         return await aiResp.text();
     }
 
-    function renderFinalReport(idData, verifications) {
+    function renderFinalReport(idData, verifications, autoReject = false) {
         loader.style.display = 'none';
         results.style.display = 'block';
         
         const idCard = document.getElementById('idDataCard');
         idCard.style.display = 'block';
-        document.getElementById('resFullName').textContent = `${idData.nombres} ${idData.apellidos}`.toUpperCase();
-        document.getElementById('resCC').textContent = formatDots(idData.cedula);
+        
+        if (autoReject) {
+            document.getElementById('resFullName').textContent = "ERROR: IDENTIFICACIÓN NO ENCONTRADA";
+            document.getElementById('resFullName').style.color = "#ef4444";
+            document.getElementById('resCC').textContent = "Punto de partida no detectado";
+        } else {
+            document.getElementById('resFullName').textContent = `${idData.nombres} ${idData.apellidos}`.toUpperCase();
+            document.getElementById('resFullName').style.color = "var(--text)";
+            document.getElementById('resCC').textContent = formatDots(idData.cedula);
+        }
         
         const list = document.getElementById('supportResultsList');
         list.innerHTML = `<p class="label" style="margin-top: 20px;">Análisis de Documentos (${verifications.length})</p>`;
@@ -213,7 +216,15 @@
         const badge = document.getElementById('verdictBadge');
         badge.style.display = 'block';
         
-        if (verifications.length === 0) {
+        if (autoReject || verifications.length === 0 && !idData.nombres) {
+            badge.textContent = "❌ RECHAZADO";
+            badge.style.background = "rgba(239, 68, 68, 0.2)";
+            badge.style.color = "#f87171";
+            const list = document.getElementById('supportResultsList');
+            list.innerHTML = `<p style="text-align:center; color:#f87171; font-weight:bold; margin-top:20px;">
+                La verificación requiere una Cédula de Ciudadanía como punto de partida. Por favor, cargue una imagen clara del documento de identidad.
+            </p>`;
+        } else if (verifications.length === 0) {
             badge.textContent = "ID DETECTADA";
             badge.style.background = "rgba(99, 102, 241, 0.2)";
             badge.style.color = "#818cf8";
