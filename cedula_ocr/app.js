@@ -34,12 +34,16 @@
             const fileDataList = [];
             
             // Inicializar Worker de Tesseract localmente para la extensión
-            const worker = await Tesseract.createWorker('spa', 1, {
+            const worker = await Tesseract.createWorker({
                 workerPath: chrome.runtime.getURL('tesseract-worker.min.js'),
                 corePath: chrome.runtime.getURL('tesseract-core.wasm.js'),
-                langPath: chrome.runtime.getURL(''), // Carpeta raíz donde está spa.traineddata
-                gzip: false // Evitar descompresión extra
+                langPath: chrome.runtime.getURL(''),
+                gzip: false,
+                logger: m => console.log("Tesseract:", m)
             });
+
+            await worker.loadLanguage('spa');
+            await worker.initialize('spa');
 
             for(let i=0; i < uploadedFiles.length; i++) {
                 const file = uploadedFiles[i];
@@ -51,7 +55,7 @@
             }
             await worker.terminate();
 
-            // FASE 1: DETECTAR CUÁL ES LA CÉDULA (Mejorado: Robusto + Fallback)
+            // FASE 1: DETECTAR CUÁL ES LA CÉDULA
             status.textContent = "Identificando Cédula Colombiana...";
             const detectionPrompt = `Analiza estos documentos OCR y dime cuál es la "Cédula de Ciudadanía Colombiana". 
             Busca palabras clave como "REPUBLICA DE COLOMBIA", "CEDULA DE CIUDADANIA", "APELLIDOS", "NOMBRES".
