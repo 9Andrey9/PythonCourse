@@ -1,6 +1,15 @@
 
-    // Configuración de PDF.js para extensiones
-    pdfjsLib.GlobalWorkerOptions.workerSrc = chrome.runtime.getURL("pdf.worker.min.js");
+    // Soporte Híbrido: Web Estándar + Extensión de Chrome
+    const getAssetPath = (file) => {
+        try {
+            return chrome.runtime.getURL(file);
+        } catch (e) {
+            return file; // Fallback a ruta relativa para GitHub Pages/Web
+        }
+    };
+
+    // Configuración de PDF.js
+    pdfjsLib.GlobalWorkerOptions.workerSrc = getAssetPath("pdf.worker.min.js");
 
     const idFile = document.getElementById('idFile');
     const extractBtn = document.getElementById('extractBtn');
@@ -39,9 +48,9 @@
             // Tesseract v5+: La configuración más robusta para MV3
             // Usamos la firma explícita (langs, oem, options) para asegurar que tome los paths locales
             const worker = await Tesseract.createWorker('spa', 1, {
-                workerPath: chrome.runtime.getURL('tesseract-worker.min.js'),
-                corePath: chrome.runtime.getURL('tesseract-core.wasm.js'),
-                langPath: chrome.runtime.getURL(''),
+                workerPath: getAssetPath('tesseract-worker.min.js'),
+                corePath: getAssetPath('tesseract-core.wasm.js'),
+                langPath: getAssetPath(''),
                 workerBlobURL: false,
                 gzip: false,
                 logger: m => {
