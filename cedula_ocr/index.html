@@ -15,26 +15,26 @@
             src: local('Segoe UI'), local('Arial');
         }
         :root {
-            --bg: #0b1121;
-            --glass: rgba(15, 23, 42, 0.85);
-            --border: rgba(255, 255, 255, 0.08);
-            --primary: #1C75BC; /* Iron Mountain Denim */
-            --secondary: #666666; /* Iron Mountain Gray */
-            --text: #ffffff;
-            --dim: #94a3b8;
+            --bg: #e0f2fe; /* Sky Blue Light */
+            --glass: rgba(255, 255, 255, 0.9);
+            --border: rgba(28, 117, 188, 0.1);
+            --primary: #1C75BC; 
+            --secondary: #666666; 
+            --text: #0f172a;
+            --dim: #475569;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
             font-family: 'Outfit', sans-serif;
-            background: #f8fafc;
-            color: #1e293b;
+            background: var(--bg);
+            color: var(--text);
             min-height: 100vh;
             display: flex;
             align-items: center; justify-content: center;
             padding: 20px;
             background-image: 
-                radial-gradient(at 0% 0%, #e2e8f0 0, transparent 50%), 
-                radial-gradient(at 100% 100%, #1C75BC22 0, transparent 50%);
+                radial-gradient(at 0% 0%, #bae6fd 0, transparent 50%), 
+                radial-gradient(at 100% 100%, #7dd3fc 0, transparent 50%);
         }
         .app-card {
             width: 100%; max-width: 520px;
@@ -168,12 +168,7 @@
 
         <div id="supportResultsList"></div>
 
-        <button id="reloadBtn" class="btn" style="display: block; background: #f8fafc; border: 1px solid #e2e8f0; color: #64748b; box-shadow: none; font-size: 0.85rem; margin-top: 20px;">🔄 New Verification Session</button>
-    </div>
-
-    <div class="footer">
-        © 2024 Iron Mountain - Florida. All Rights Reserved. <br>
-        Confidential Document Processing Unit.
+        <button id="reloadBtn" class="btn" style="display: block; background: #ffffff; border: 1px solid #bae6fd; color: #475569; box-shadow: none; font-size: 0.85rem; margin-top: 20px;">🔄 New Verification Session</button>
     </div>
 </div>
 
