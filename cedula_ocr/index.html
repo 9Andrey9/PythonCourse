@@ -15,13 +15,13 @@
             src: local('Segoe UI'), local('Arial');
         }
         :root {
-            --bg: #1C75BC; /* Strong Iron Mountain Denim */
-            --glass: #f0f9ff; /* Soft Sky Blue Card */
-            --border: #e0f2fe;
-            --primary: #1C75BC; 
-            --secondary: #64748b; 
-            --text: #0f172a;
-            --dim: #475569;
+            --bg: #1C75BC; /* Iron Mountain Denim */
+            --glass: #1764a3; /* Deeper Denim for card */
+            --border: rgba(255, 255, 255, 0.15);
+            --primary: #ffffff; 
+            --secondary: #ffffff; 
+            --text: #ffffff;
+            --dim: rgba(255, 255, 255, 0.7);
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
@@ -37,15 +37,15 @@
                 radial-gradient(at 100% 100%, #172554 0, transparent 50%);
         }
         .app-card {
-            width: 100%; max-width: 520px;
+            width: 100%; max-width: 580px; /* Slightly wider for the larger logo */
             background: var(--glass);
-            border: 1px solid rgba(255,255,255,0.2);
+            border: 1px solid var(--border);
             border-radius: 12px;
             padding: 60px 40px;
-            box-shadow: 0 40px 100px -15px rgba(0, 0, 0, 0.4);
+            box-shadow: 0 50px 100px -20px rgba(0, 0, 0, 0.5);
             animation: fadeIn 0.4s ease-out;
             position: relative;
-            color: #0f172a;
+            color: #ffffff;
         }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } }
         
@@ -54,9 +54,10 @@
             margin-bottom: 40px;
         }
         .corp-logo {
-            width: 280px;
+            width: 380px; /* Much larger logo */
+            max-width: 100%;
             height: auto;
-            margin-bottom: 25px;
+            margin-bottom: 30px;
         }
         h1 {
             display: none; /* Logo contains the text in the reference image */
@@ -88,35 +89,35 @@
 
         .btn {
             width: 100%; padding: 18px; border: none; border-radius: 12px;
-            background: var(--primary);
-            color: white; font-weight: 700; font-size: 1.1rem;
+            background: #ffffff;
+            color: #1C75BC; font-weight: 700; font-size: 1.1rem;
             cursor: pointer; transition: 0.3s;
             margin-top: 20px;
             display: none;
         }
-        .btn:hover { background: #1a6ab0; transform: translateY(-1px); }
+        .btn:hover { background: #f0f9ff; transform: translateY(-1px); }
 
         #loader { display: none; text-align: center; margin: 30px 0; }
         .spinner {
-            width: 44px; height: 44px; border: 3px solid rgba(255,255,255,0.05);
-            border-top: 3px solid var(--primary); border-radius: 50%;
+            width: 44px; height: 44px; border: 3px solid rgba(255,255,255,0.1);
+            border-top: 3px solid #ffffff; border-radius: 50%;
             animation: spin 0.8s linear infinite; margin: 0 auto 15px;
         }
         @keyframes spin { to { transform: rotate(360deg); } }
-        #status { font-weight: 500; font-size: 0.85rem; color: #a5b4fc; }
+        #status { font-weight: 500; font-size: 0.85rem; color: #ffffff; opacity: 0.9; }
 
         #results { display: none; margin-top: 20px; animation: slideUp 0.5s ease; }
         @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } }
         .data-card {
-            background: #ffffff;
-            border: 1px solid #e0f2fe;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 12px;
             padding: 20px;
             margin-bottom: 15px;
         }
-        .label { font-size: 0.6rem; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 4px; }
-        .value { font-size: 1.2rem; font-weight: 700; color: #0f172a; }
-        .cc-val { color: var(--primary); font-family: 'Monaco', monospace; font-size: 1.4rem; font-weight: 700; }
+        .label { font-size: 0.6rem; font-weight: 800; color: rgba(255, 255, 255, 0.6); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 4px; }
+        .value { font-size: 1.2rem; font-weight: 700; color: #ffffff; }
+        .cc-val { color: #ffffff; font-family: 'Monaco', monospace; font-size: 1.4rem; font-weight: 700; }
         
         .footer {
             margin-top: 40px;
@@ -167,7 +168,7 @@
 
         <div id="supportResultsList"></div>
 
-        <button id="reloadBtn" class="btn" style="display: block; background: #ffffff; border: 1px solid #bae6fd; color: #475569; box-shadow: none; font-size: 0.85rem; margin-top: 20px;">🔄 New Verification Session</button>
+        <button id="reloadBtn" class="btn" style="display: block; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #ffffff; box-shadow: none; font-size: 0.85rem; margin-top: 20px;">🔄 New Verification Session</button>
     </div>
 </div>
 
