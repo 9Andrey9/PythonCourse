@@ -15,13 +15,13 @@
             src: local('Segoe UI'), local('Arial');
         }
         :root {
-            --bg: #e0f2fe; /* Light Sky Blue environment */
-            --glass: #1C75BC; /* Iron Mountain Denim Primary */
-            --border: rgba(255, 255, 255, 0.1);
-            --primary: #ffffff; /* White for icons/accents on blue */
-            --secondary: #ffffff; 
-            --text: #ffffff;
-            --dim: rgba(255, 255, 255, 0.7);
+            --bg: #1C75BC; /* Strong Iron Mountain Denim */
+            --glass: #ffffff; /* Clean White Card */
+            --border: #e2e8f0;
+            --primary: #1C75BC; 
+            --secondary: #666666; 
+            --text: #0f172a;
+            --dim: #64748b;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
@@ -33,19 +33,19 @@
             align-items: center; justify-content: center;
             padding: 20px;
             background-image: 
-                radial-gradient(at 0% 0%, #bae6fd 0, transparent 50%), 
-                radial-gradient(at 100% 100%, #7dd3fc 0, transparent 50%);
+                radial-gradient(at 0% 0%, #1e3a8a 0, transparent 50%), 
+                radial-gradient(at 100% 100%, #172554 0, transparent 50%);
         }
         .app-card {
             width: 100%; max-width: 520px;
             background: var(--glass);
             border: none;
-            border-radius: 4px; /* More angular corporate look like the image */
+            border-radius: 12px;
             padding: 60px 40px;
-            box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.25);
+            box-shadow: 0 40px 80px -15px rgba(0, 0, 0, 0.5);
             animation: fadeIn 0.4s ease-out;
             position: relative;
-            color: white;
+            color: #0f172a;
         }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } }
         
@@ -61,7 +61,7 @@
         h1 {
             display: none; /* Logo contains the text in the reference image */
         }
-        .tagline { color: white; font-size: 0.85rem; font-weight: 500; text-align: center; margin-bottom: 0; opacity: 0.9; }
+        .tagline { color: var(--primary); font-size: 0.8rem; font-weight: 700; text-align: center; margin-bottom: 0; text-transform: uppercase; letter-spacing: 0.1em; }
 
         .upload-container {
             position: relative;
@@ -70,30 +70,31 @@
         }
         .upload-area {
             display: block;
-            border: 1px solid rgba(255,255,255,0.3);
-            border-radius: 8px;
+            border: 2px dashed #e2e8f0;
+            border-radius: 12px;
             padding: 40px 20px;
             text-align: center;
             cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            background: rgba(255,255,255,0.05);
+            transition: all 0.3s ease;
+            background: #f8fafc;
             width: 100%;
         }
         .upload-area:hover {
-            background: rgba(255,255,255,0.1);
+            border-color: var(--primary);
+            background: #f1f5f9;
         }
-        .upload-area p { font-size: 1rem; font-weight: 600; margin-bottom: 5px; color: #fff; }
-        .upload-area span { font-size: 0.8rem; color: rgba(255,255,255,0.7); }
+        .upload-area p { font-size: 1rem; font-weight: 600; margin-bottom: 5px; color: #0f172a; }
+        .upload-area span { font-size: 0.8rem; color: #64748b; }
 
         .btn {
-            width: 100%; padding: 18px; border: none; border-radius: 8px;
-            background: white;
-            color: #1C75BC; font-weight: 700; font-size: 1.1rem;
+            width: 100%; padding: 18px; border: none; border-radius: 12px;
+            background: var(--primary);
+            color: white; font-weight: 700; font-size: 1.1rem;
             cursor: pointer; transition: 0.3s;
             margin-top: 20px;
             display: none;
         }
-        .btn:hover { background: #f8fafc; transform: translateY(-1px); }
+        .btn:hover { background: #1a6ab0; transform: translateY(-1px); }
 
         #loader { display: none; text-align: center; margin: 30px 0; }
         .spinner {
@@ -107,15 +108,15 @@
         #results { display: none; margin-top: 20px; animation: slideUp 0.5s ease; }
         @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } }
         .data-card {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 8px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
             padding: 20px;
             margin-bottom: 15px;
         }
-        .label { font-size: 0.6rem; font-weight: 800; color: rgba(255, 255, 255, 0.6); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 4px; }
-        .value { font-size: 1.2rem; font-weight: 700; color: #ffffff; }
-        .cc-val { color: #ffffff; font-family: 'Monaco', monospace; font-size: 1.4rem; opacity: 0.9; }
+        .label { font-size: 0.6rem; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 4px; }
+        .value { font-size: 1.2rem; font-weight: 700; color: #0f172a; }
+        .cc-val { color: var(--primary); font-family: 'Monaco', monospace; font-size: 1.4rem; font-weight: 700; }
         
         .footer {
             margin-top: 40px;
