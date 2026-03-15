@@ -131,7 +131,7 @@
         
         REGLAS DE ORO:
         1. NOMBRES COMPLETOS: Extrae TODOS los nombres de pila del titular (ej: si es "MIYER ANDREY", pon ambos). No omitas ninguno.
-        2. APELLIDOS COMPLETOS: Extrae ambos apellidos del titular.
+        2. APELLIDOS COMPLETOS: Extrae ambos apellidos del titular CON ESPACIO ENTRE ELLOS (ej: "PEÑA PEÑA").
         3. ORDEN: Respeta estrictamente el orden del documento.
         4. LIMPIEZA: Elimina ruidos como letras sueltas (ej: "ANDREY E" -> "ANDREY") y nombres de registradores.
         
