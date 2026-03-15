@@ -1,11 +1,15 @@
 
     // Soporte Híbrido: Web Estándar + Extensión de Chrome
     const getAssetPath = (file) => {
-        try {
-            return chrome.runtime.getURL(file);
-        } catch (e) {
-            return file; // Fallback a ruta relativa para GitHub Pages/Web
+        if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.getURL) {
+            try {
+                return chrome.runtime.getURL(file);
+            } catch (e) {}
         }
+        // Modo Web (GitHub Pages): Construir ruta absoluta basada en la URL actual
+        const baseUrl = window.location.href.split(/[?#]/)[0];
+        const baseDir = baseUrl.substring(0, baseUrl.lastIndexOf('/') + 1);
+        return baseDir + file;
     };
 
     // Configuración de PDF.js
@@ -50,7 +54,7 @@
             const worker = await Tesseract.createWorker('spa', 1, {
                 workerPath: getAssetPath('tesseract-worker.min.js'),
                 corePath: getAssetPath('tesseract-core.wasm.js'),
-                langPath: getAssetPath(''),
+                langPath: getAssetPath('').replace(/\/$/, ''), // Carpeta raíz donde está spa.traineddata
                 workerBlobURL: false,
                 gzip: false,
                 logger: m => {
