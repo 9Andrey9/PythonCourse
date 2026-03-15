@@ -1,3 +1,4 @@
+
     // Configuración de PDF.js para extensiones
     pdfjsLib.GlobalWorkerOptions.workerSrc = chrome.runtime.getURL("pdf.worker.min.js");
 
@@ -30,20 +31,32 @@
         loader.style.display = 'block';
         
         try {
+            status.textContent = "Preparando motor OCR v5...";
+            
             // FASE 0: OCR DE TODOS LOS ARCHIVOS
             const fileDataList = [];
             
-            // Inicializar Worker de Tesseract localmente para la extensión
-            const worker = await Tesseract.createWorker({
+            // Tesseract v5+: La configuración más robusta para MV3
+            // Usamos la firma explícita (langs, oem, options) para asegurar que tome los paths locales
+            const worker = await Tesseract.createWorker('spa', 1, {
                 workerPath: chrome.runtime.getURL('tesseract-worker.min.js'),
                 corePath: chrome.runtime.getURL('tesseract-core.wasm.js'),
                 langPath: chrome.runtime.getURL(''),
+                workerBlobURL: false,
                 gzip: false,
-                logger: m => console.log("Tesseract:", m)
+                logger: m => {
+                    if (m.status === 'recognizing text') {
+                        status.textContent = `Analizando... ${(m.progress * 100).toFixed(0)}%`;
+                    }
+                }
             });
 
-            await worker.loadLanguage('spa');
-            await worker.initialize('spa');
+            // En v5 con la firma anterior, ya está cargado e inicializado para 'spa'
+            // pero por seguridad llamamos a setParameters si es necesario.
+            await worker.setParameters({
+                tessjs_create_pdf: '0',
+                tessjs_create_hocr: '0'
+            });
 
             for(let i=0; i < uploadedFiles.length; i++) {
                 const file = uploadedFiles[i];
@@ -51,7 +64,9 @@
                 
                 let img = file.type === 'application/pdf' ? await convertPdfToImage(file) : await processImageFile(file);
                 const ocr = await worker.recognize(img);
-                fileDataList.push({ name: file.name, text: ocr.data.text, index: i });
+                // Truncar texto para no saturar la IA (máx 3000 chars por archivo)
+                const truncatedText = ocr.data.text.substring(0, 3000);
+                fileDataList.push({ name: file.name, text: truncatedText, index: i });
             }
             await worker.terminate();
 
@@ -68,13 +83,10 @@
             let detectedIDStr = await callAI(detectionPrompt);
             let idIndex = -1;
             
-            // Intento 1: Parsing de la IA con Regex
             const match = detectedIDStr.match(/\d+/);
             if (match) idIndex = parseInt(match[0]);
 
-            // Intento 2: Heurística manual (Fallback) si la IA falla o el ID es inválido
             if (idIndex < 0 || idIndex >= fileDataList.length) {
-                console.log("IA falló en detectar ID, usando heurística...");
                 idIndex = fileDataList.findIndex(f => {
                     const t = f.text.toUpperCase();
                     return t.includes("REPUBLICA") || t.includes("COLOMBIA") || t.includes("CEDULA") || t.includes("NOMBRES");
@@ -87,26 +99,26 @@
 
             const activeIDText = fileDataList[idIndex].text;
             
-            // FASE 2: EXTRAER DATOS TITULAR (Reglas de Oro Restituidas)
+            // FASE 2: EXTRAER DATOS TITULAR
             status.textContent = "Extrayendo identidad del titular...";
             const idData = await cleanIDData(activeIDText);
             
             // FASE 3: VERIFICAR EL RESTO DE DOCUMENTOS
             const verifications = [];
             for (let i = 0; i < fileDataList.length; i++) {
-                if (i === idIndex) continue; // Saltamos la propia cédula
+                if (i === idIndex) continue;
                 const file = fileDataList[i];
                 status.textContent = `Cruzando datos con ${file.name}...`;
                 
-                const match = await verifyMatch(idData, file.text, file.name);
-                verifications.push(match);
+                const matchResult = await verifyMatch(idData, file.text, file.name);
+                verifications.push(matchResult);
             }
 
             renderFinalReport(idData, verifications);
 
         } catch (err) {
             console.error("ANALYSIS_ERROR:", err);
-            alert("Error en el análisis: " + (err.message || JSON.stringify(err) || "Ocurrió un error inesperado al procesar los archivos."));
+            alert("Error en el análisis: " + (err.message || "Ocurrió un error inesperado."));
             location.reload();
         }
     };
@@ -118,16 +130,16 @@
         TEXTO OCR: "${rawText}"
         
         REGLAS DE ORO:
-        1. NOMBRES COMPLETOS: Extrae TODOS los nombres de pila del titular (ej: si es "MIYER ANDREY", pon ambos). No omitas ninguno.
+        1. NOMBRES COMPLETOS: Extrae TODOS los nombres de pila del titular.
         2. APELLIDOS COMPLETOS: Extrae ambos apellidos del titular.
-        3. ORDEN: Respeta estrictamente el orden del documento.
-        4. LIMPIEZA: Elimina ruidos como letras sueltas (ej: "ANDREY E" -> "ANDREY") y nombres de registradores.
+        3. CC: El número de cédula.
         
         Responde estrictamente en JSON:
         {"nombres": "...", "apellidos": "...", "cedula": "..."}`;
         
         const resp = await callAI(prompt);
-        return parseCleanJSON(resp);
+        const defaults = { nombres: "NO DETECTADO", apellidos: "NO DETECTADO", cedula: "0" };
+        return parseCleanJSON(resp, defaults);
     }
 
     async function verifyMatch(idData, supportText, fileName) {
@@ -135,16 +147,12 @@
         TITULAR ESTIMADO: ${idData.nombres} ${idData.apellidos}, CC: ${idData.cedula}
         TEXTO DEL DOCUMENTO A VERIFICAR (${fileName}): "${supportText}"
         
-        CRITERIOS:
-        - Si el nombre/apellido coincide (aunque falte un segundo nombre), marca matched: true pero menciona la duda en reason.
-        - Si la cédula coincide, es un match fuerte.
-        - Si no hay ninguna coincidencia clara, matched: false.
-        
         Responde en JSON:
-        {"matched": boolean, "reason": "breve explicación de la decisión", "dataFound": "qué fragmentos de nombre/CC encontraste"}`;
+        {"matched": boolean, "reason": "breve explicación", "dataFound": "qué fragmentos encontraste"}`;
         
         const resp = await callAI(prompt);
-        const result = parseCleanJSON(resp);
+        const defaults = { matched: false, reason: "Error al procesar respuesta AI", dataFound: "N/A" };
+        const result = parseCleanJSON(resp, defaults);
         result.fileName = fileName;
         return result;
     }
@@ -156,7 +164,7 @@
             body: JSON.stringify({
                 messages: [{ role: "user", content: prompt }],
                 model: "openai",
-                jsonMode: true
+                extra_args: { json_mode: true }
             })
         });
         return await aiResp.text();
@@ -166,7 +174,6 @@
         loader.style.display = 'none';
         results.style.display = 'block';
         
-        // Mostrar card de la cédula detectada
         const idCard = document.getElementById('idDataCard');
         idCard.style.display = 'block';
         document.getElementById('resFullName').textContent = `${idData.nombres} ${idData.apellidos}`.toUpperCase();
@@ -179,17 +186,20 @@
         let doubts = false;
 
         verifications.forEach(v => {
-            if (!v.matched) allMatched = false;
-            const resLower = v.reason.toLowerCase();
+            if (!v || typeof v !== 'object') return;
+            if (v.matched === false) allMatched = false;
+            
+            const reason = v.reason || "Sin explicación disponible";
+            const resLower = reason.toLowerCase();
             if (v.matched && (resLower.includes("duda") || resLower.includes("parcial"))) doubts = true;
 
             const div = document.createElement('div');
             div.className = 'data-card';
             div.style.borderLeft = v.matched ? '4px solid #10b981' : '4px solid #ef4444';
             div.innerHTML = `
-                <p style="font-size: 0.8rem; font-weight: 700; color: ${v.matched ? '#10b981' : '#f87171'}">${v.fileName}</p>
-                <p style="font-size: 0.9rem; margin-top: 5px;">${v.reason}</p>
-                <p style="font-size: 0.75rem; color: var(--dim); margin-top: 4px;">Encontrado: ${v.dataFound}</p>
+                <p style="font-size: 0.8rem; font-weight: 700; color: ${v.matched ? '#10b981' : '#f87171'}">${v.fileName || 'Archivo'}</p>
+                <p style="font-size: 0.9rem; margin-top: 5px;">${reason}</p>
+                <p style="font-size: 0.75rem; color: var(--dim); margin-top: 4px;">Encontrado: ${v.dataFound || 'No especificado'}</p>
             `;
             list.appendChild(div);
         });
@@ -230,27 +240,19 @@
         return canvas.toDataURL('image/jpeg', 0.95);
     }
 
-    // Nueva función para mejorar la calidad de la imagen antes del OCR
     function applyImageFilters(ctx, canvas) {
         const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
         const data = imageData.data;
-        
         for (let i = 0; i < data.length; i += 4) {
-            // Convertir a escala de grises
             const avg = (data[i] + data[i+1] + data[i+2]) / 3;
-            
-            // Aumentar contraste (umbral simple)
             const contrast = 1.2;
-            let val = avg;
-            val = ((val / 255 - 0.5) * contrast + 0.5) * 255;
+            let val = ((avg / 255 - 0.5) * contrast + 0.5) * 255;
             val = Math.max(0, Math.min(255, val));
-            
             data[i] = data[i+1] = data[i+2] = val;
         }
         ctx.putImageData(imageData, 0, 0);
     }
 
-    // Ajustamos la carga de imagen normal para que también pase por filtros
     async function processImageFile(file) {
         return new Promise((resolve) => {
             const reader = new FileReader();
@@ -271,20 +273,17 @@
         });
     }
 
-    function parseCleanJSON(text) {
+    function parseCleanJSON(text, defaults = {}) {
         try {
-            // Limpiar posibles bloques de código Markdown
+            if (!text) return defaults;
             let clean = text.replace(/```json/g, '').replace(/```/g, '').trim();
             const start = clean.indexOf('{');
             const end = clean.lastIndexOf('}');
-            if (start === -1) {
-                console.error("JSON_NOT_FOUND:", text);
-                return {};
-            }
-            return JSON.parse(clean.substring(start, end + 1));
+            if (start === -1) return defaults;
+            return { ...defaults, ...JSON.parse(clean.substring(start, end + 1)) };
         } catch (e) { 
-            console.error("JSON_PARSE_ERROR:", e, text);
-            return {}; 
+            console.error("JSON_PARSE_ERROR:", e);
+            return defaults; 
         }
     }
 

@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SIV Lite — Extractor de Identidad</title>
     
-    <!-- Librerías Modernas y Estables (Funcionan desde Archivo Local) -->
+    <!-- Librerías Modernas y Estables (Locales) -->
     <script src="pdf.min.js"></script>
     <script src="tesseract.min.js"></script>
     
@@ -56,7 +56,6 @@
         }
         .tagline { text-align: center; color: var(--dim); font-size: 0.9rem; margin-bottom: 35px; }
 
-        /* Arreglo para el error de ventana dividida */
         .upload-container {
             position: relative;
             width: 100%;
@@ -91,7 +90,6 @@
         }
         .btn:hover { transform: scale(1.02); box-shadow: 0 15px 25px -10px rgba(99, 102, 241, 0.5); }
 
-        /* Loader */
         #loader { display: none; text-align: center; margin: 30px 0; }
         .spinner {
             width: 44px; height: 44px; border: 3px solid rgba(255,255,255,0.05);
@@ -101,7 +99,6 @@
         @keyframes spin { to { transform: rotate(360deg); } }
         #status { font-weight: 500; font-size: 0.85rem; color: #a5b4fc; }
 
-        /* Results */
         #results { display: none; margin-top: 20px; animation: slideUp 0.5s ease; }
         @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } }
         .data-card {
@@ -127,7 +124,7 @@
     <div id="mainUI">
         <label class="label">Carga Inteligente de Documentos</label>
         <div class="upload-container">
-            <label for="idFile" class="upload-area" id="dropZone">
+            <label for="idFile" class="upload-area">
                 <p id="fileNameDisplay">📂 Sube todos tus documentos aquí</p>
                 <span>Cédula + Facturas, Contratos o Certificados</span>
                 <input type="file" id="idFile" accept="image/*,application/pdf" multiple>
@@ -157,6 +154,5 @@
 </div>
 
 <script src="app.js"></script>
-
 </body>
 </html>

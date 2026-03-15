@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "SIV Lite - Verificador de Identidad",
-  "version": "1.1",
-  "description": "Sistema Inteligente de Verificación de Identidad Colombiana usando OCR e IA.",
+  "version": "1.2",
+  "description": "Sistema Inteligente de Verificación de Identidad Colombiana usando OCR v5 e IA.",
   "action": {
     "default_title": "Abrir SIV Lite",
     "default_icon": "icon128.png"
@@ -25,6 +25,7 @@
       "resources": [
         "tesseract-worker.min.js",
         "tesseract-core.wasm.js",
+        "tesseract-core-simd.wasm.js",
         "tesseract-core.wasm",
         "tesseract-core-simd.wasm",
         "pdf.worker.min.js",
