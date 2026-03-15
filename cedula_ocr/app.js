@@ -141,8 +141,10 @@
         REGLAS DE ORO:
         1. NOMBRES COMPLETOS: Extrae TODOS los nombres de pila del titular (ej: si es "MIYER ANDREY", pon ambos). No omitas ninguno.
         2. APELLIDOS COMPLETOS: Extrae ambos apellidos del titular CON ESPACIO ENTRE ELLOS (ej: "PEÑA PEÑA").
-        3. ORDEN: Respeta estrictamente el orden del documento.
-        4. LIMPIEZA: Elimina ruidos como letras sueltas (ej: "ANDREY E" -> "ANDREY") y nombres de registradores.
+        3. CÉDULA: Extrae el número de identificación. 
+           IMPORTANTE: NO CONFUNDAS CON CELULARES. Si un número empieza por "3" y tiene 10 dígitos, NO es la cédula, es un teléfono. Ignóralo.
+        4. ORDEN: Respeta estrictamente el orden del documento.
+        5. LIMPIEZA: Elimina ruidos como letras sueltas (ej: "ANDREY E" -> "ANDREY") y nombres de registradores.
         
         Responde estrictamente en JSON:
         {"nombres": "...", "apellidos": "...", "cedula": "..."}`;
@@ -237,9 +239,9 @@
                 La verificación requiere una Cédula de Ciudadanía como punto de partida. Por favor, cargue una imagen clara del documento de identidad.
             </p>`;
         } else if (verifications.length === 0) {
-            badge.textContent = "ID DETECTADA";
-            badge.style.background = "rgba(99, 102, 241, 0.2)";
-            badge.style.color = "#818cf8";
+            badge.textContent = "🆔 ID DETECTADA";
+            badge.style.background = "rgba(255, 255, 255, 0.1)";
+            badge.style.color = "#ffffff";
         } else if (allMatched && !doubts) {
             badge.textContent = "✅ APROBADO";
             badge.style.background = "rgba(16, 185, 129, 0.2)";
