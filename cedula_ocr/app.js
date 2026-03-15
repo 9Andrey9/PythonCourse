@@ -91,7 +91,8 @@
             LISTA:
             ${fileDataList.map((f, i) => `[ID: ${i}] Archivo: ${f.name} | Texto: ${f.text.substring(0, 500)}`).join('\n')}
             
-            RESPONDE ÚNICAMENTE EL NÚMERO DEL ID (ej: 0). Si tienes dudas, elige el que más se parezca a una identificación.`;
+            RESPONDE ÚNICAMENTE EL NÚMERO DEL ID (ej: 0). 
+            SI NO ENCUENTRAS NINGUN DOCUMENTO QUE SEA UNA CÉDULA DE CIUDADANÍA COLOMBIANA, RESPONDE "NONE".`;
             
             let detectedIDStr = await callAI(detectionPrompt);
             let idIndex = -1;
@@ -99,9 +100,9 @@
             const match = detectedIDStr.match(/\d+/);
             if (match) idIndex = parseInt(match[0]);
 
-            if (idIndex < 0 || idIndex >= fileDataList.length) {
+            if (detectedIDStr.includes("NONE") || idIndex < 0 || idIndex >= fileDataList.length) {
                 // RECHAZO AUTOMÁTICO: No se detectó ninguna cédula
-                renderFinalReport({ nombres: "RECHAZADO", apellidos: "CÉDULA NO DETECTADA", cedula: "0" }, [], true);
+                renderFinalReport({ nombres: "IDENTIDAD NO DETECTADA", apellidos: "", cedula: "0" }, [], true);
                 return;
             }
 
@@ -192,9 +193,7 @@
         idCard.style.display = 'block';
         
         if (autoReject) {
-            document.getElementById('resFullName').textContent = "ERROR: IDENTIFICACIÓN NO ENCONTRADA";
-            document.getElementById('resFullName').style.color = "#ef4444";
-            document.getElementById('resCC').textContent = "Punto de partida no detectado";
+            idCard.style.display = 'none'; // No mostrar tarjeta de datos si es rechazo por falta de ID
         } else {
             document.getElementById('resFullName').textContent = `${idData.nombres} ${idData.apellidos}`.toUpperCase();
             document.getElementById('resFullName').style.color = "var(--text)";
