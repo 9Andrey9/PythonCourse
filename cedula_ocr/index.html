@@ -26,35 +26,42 @@
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
             font-family: 'Outfit', sans-serif;
-            background: var(--bg);
-            color: var(--text);
+            background: #f8fafc;
+            color: #1e293b;
             min-height: 100vh;
             display: flex;
             align-items: center; justify-content: center;
             padding: 20px;
             background-image: 
-                radial-gradient(at 0% 0%, #0f172a 0, transparent 50%), 
-                radial-gradient(at 100% 100%, #1e3a8a 0, transparent 50%);
+                radial-gradient(at 0% 0%, #e2e8f0 0, transparent 50%), 
+                radial-gradient(at 100% 100%, #1C75BC22 0, transparent 50%);
         }
         .app-card {
-            width: 100%; max-width: 480px;
-            background: var(--glass);
-            backdrop-filter: blur(24px);
-            border: 1px solid var(--border);
-            border-radius: 40px;
-            padding: 40px;
-            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.6);
-            animation: fadeIn 0.6s ease-out;
+            width: 100%; max-width: 520px;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 50px 40px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            animation: fadeIn 0.4s ease-out;
             position: relative;
         }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } }
         
-        h1 {
-            font-size: 1.8rem; font-weight: 800; text-align: center; margin-bottom: 6px;
-            color: #fff;
-            letter-spacing: -0.02em;
+        .brand-header {
+            text-align: center;
+            margin-bottom: 40px;
         }
-        .tagline { text-align: center; color: var(--primary); font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 35px; }
+        .corp-logo {
+            width: 220px;
+            height: auto;
+            margin-bottom: 15px;
+        }
+        h1 {
+            font-size: 1.5rem; font-weight: 700; color: #0f172a; margin-bottom: 4px;
+            letter-spacing: -0.01em; text-transform: uppercase;
+        }
+        .tagline { color: var(--primary); font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 0; }
 
         .upload-container {
             position: relative;
@@ -102,15 +109,24 @@
         #results { display: none; margin-top: 20px; animation: slideUp 0.5s ease; }
         @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } }
         .data-card {
-            background: rgba(0, 0, 0, 0.2);
-            border: 1px solid var(--border);
-            border-radius: 20px;
+            background: #f1f5f9;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
             padding: 20px;
             margin-bottom: 15px;
         }
-        .label { font-size: 0.65rem; font-weight: 800; color: var(--dim); text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 4px; }
-        .value { font-size: 1.25rem; font-weight: 700; color: #fff; }
-        .cc-val { color: var(--primary); font-family: 'Monaco', monospace; font-size: 1.5rem; }
+        .label { font-size: 0.6rem; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 4px; }
+        .value { font-size: 1.2rem; font-weight: 700; color: #0f172a; }
+        .cc-val { color: var(--primary); font-family: 'Monaco', monospace; font-size: 1.4rem; }
+        
+        .footer {
+            margin-top: 40px;
+            text-align: center;
+            font-size: 0.7rem;
+            color: #94a3b8;
+            border-top: 1px solid #f1f5f9;
+            padding-top: 20px;
+        }
 
         input[type="file"] { display: none; }
     </style>
@@ -118,8 +134,11 @@
 <body>
 
 <div class="app-card">
-    <h1>Iron Mountain</h1>
-    <p class="tagline">Florida — Identity Verification</p>
+    <div class="brand-header">
+        <img src="logo.png" alt="Iron Mountain Logo" class="corp-logo">
+        <h1>Identity Verification</h1>
+        <p class="tagline">Florida Operations Division</p>
+    </div>
 
     <div id="mainUI">
         <label class="label">Carga Inteligente de Documentos</label>
@@ -149,7 +168,12 @@
 
         <div id="supportResultsList"></div>
 
-        <button id="reloadBtn" class="btn" style="display: block; background: rgba(255,255,255,0.05); color: var(--dim); box-shadow: none; font-size: 0.9rem;">🔄 Nueva Verificación</button>
+        <button id="reloadBtn" class="btn" style="display: block; background: #f8fafc; border: 1px solid #e2e8f0; color: #64748b; box-shadow: none; font-size: 0.85rem; margin-top: 20px;">🔄 New Verification Session</button>
+    </div>
+
+    <div class="footer">
+        © 2024 Iron Mountain - Florida. All Rights Reserved. <br>
+        Confidential Document Processing Unit.
     </div>
 </div>
 
