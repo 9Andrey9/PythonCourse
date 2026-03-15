@@ -1,10 +1,10 @@
 {
   "manifest_version": 3,
-  "name": "SIV Lite - Verificador de Identidad",
-  "version": "1.2",
-  "description": "Sistema Inteligente de Verificación de Identidad Colombiana usando OCR v5 e IA.",
+  "name": "Iron Mountain - ID Verification Florida",
+  "version": "1.3",
+  "description": "Herramienta corporativa para la verificación inteligente de identidad y validación cruzada de documentos (Florida Operations).",
   "action": {
-    "default_title": "Abrir SIV Lite",
+    "default_title": "Iron Mountain ID Verification",
     "default_icon": "icon128.png"
   },
   "permissions": ["storage"],
