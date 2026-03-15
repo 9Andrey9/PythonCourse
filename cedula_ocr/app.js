@@ -130,9 +130,10 @@
         TEXTO OCR: "${rawText}"
         
         REGLAS DE ORO:
-        1. NOMBRES COMPLETOS: Extrae TODOS los nombres de pila del titular.
+        1. NOMBRES COMPLETOS: Extrae TODOS los nombres de pila del titular (ej: si es "MIYER ANDREY", pon ambos). No omitas ninguno.
         2. APELLIDOS COMPLETOS: Extrae ambos apellidos del titular.
-        3. CC: El número de cédula.
+        3. ORDEN: Respeta estrictamente el orden del documento.
+        4. LIMPIEZA: Elimina ruidos como letras sueltas (ej: "ANDREY E" -> "ANDREY") y nombres de registradores.
         
         Responde estrictamente en JSON:
         {"nombres": "...", "apellidos": "...", "cedula": "..."}`;
@@ -147,8 +148,13 @@
         TITULAR ESTIMADO: ${idData.nombres} ${idData.apellidos}, CC: ${idData.cedula}
         TEXTO DEL DOCUMENTO A VERIFICAR (${fileName}): "${supportText}"
         
+        CRITERIOS:
+        - Si el nombre/apellido coincide (aunque falte un segundo nombre), marca matched: true pero menciona la duda en reason.
+        - Si la cédula coincide, es un match fuerte.
+        - Si no hay ninguna coincidencia clara, matched: false.
+        
         Responde en JSON:
-        {"matched": boolean, "reason": "breve explicación", "dataFound": "qué fragmentos encontraste"}`;
+        {"matched": boolean, "reason": "breve explicación de la decisión", "dataFound": "qué fragmentos de nombre/CC encontraste"}`;
         
         const resp = await callAI(prompt);
         const defaults = { matched: false, reason: "Error al procesar respuesta AI", dataFound: "N/A" };
