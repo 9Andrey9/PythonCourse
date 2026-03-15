@@ -16,12 +16,12 @@
         }
         :root {
             --bg: #1C75BC; /* Strong Iron Mountain Denim */
-            --glass: #ffffff; /* Clean White Card */
-            --border: #e2e8f0;
+            --glass: #f0f9ff; /* Soft Sky Blue Card */
+            --border: #e0f2fe;
             --primary: #1C75BC; 
-            --secondary: #666666; 
+            --secondary: #64748b; 
             --text: #0f172a;
-            --dim: #64748b;
+            --dim: #475569;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
@@ -39,10 +39,10 @@
         .app-card {
             width: 100%; max-width: 520px;
             background: var(--glass);
-            border: none;
+            border: 1px solid rgba(255,255,255,0.2);
             border-radius: 12px;
             padding: 60px 40px;
-            box-shadow: 0 40px 80px -15px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 40px 100px -15px rgba(0, 0, 0, 0.4);
             animation: fadeIn 0.4s ease-out;
             position: relative;
             color: #0f172a;
@@ -70,18 +70,18 @@
         }
         .upload-area {
             display: block;
-            border: 2px dashed #e2e8f0;
+            border: 2px dashed #bae6fd;
             border-radius: 12px;
             padding: 40px 20px;
             text-align: center;
             cursor: pointer;
             transition: all 0.3s ease;
-            background: #f8fafc;
+            background: #ffffff;
             width: 100%;
         }
         .upload-area:hover {
             border-color: var(--primary);
-            background: #f1f5f9;
+            background: #f0f9ff;
         }
         .upload-area p { font-size: 1rem; font-weight: 600; margin-bottom: 5px; color: #0f172a; }
         .upload-area span { font-size: 0.8rem; color: #64748b; }
@@ -108,8 +108,8 @@
         #results { display: none; margin-top: 20px; animation: slideUp 0.5s ease; }
         @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } }
         .data-card {
-            background: #f8fafc;
-            border: 1px solid #e2e8f0;
+            background: #ffffff;
+            border: 1px solid #e0f2fe;
             border-radius: 12px;
             padding: 20px;
             margin-bottom: 15px;
