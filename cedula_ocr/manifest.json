@@ -1,0 +1,23 @@
+{
+  "manifest_version": 3,
+  "name": "SIV Lite - Verificador de Identidad",
+  "version": "1.1",
+  "description": "Sistema Inteligente de Verificación de Identidad Colombiana usando OCR e IA.",
+  "action": {
+    "default_title": "Abrir SIV Lite",
+    "default_icon": "icon128.png"
+  },
+  "permissions": ["storage"],
+  "host_permissions": [
+    "https://text.pollinations.ai/*"
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'"
+  },
+  "icons": {
+    "128": "icon128.png"
+  },
+  "background": {
+    "service_worker": "background.js"
+  }
+}

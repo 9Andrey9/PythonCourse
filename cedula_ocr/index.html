@@ -6,11 +6,14 @@
     <title>SIV Lite — Extractor de Identidad</title>
     
     <!-- Librerías Modernas y Estables (Funcionan desde Archivo Local) -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <script src="pdf.min.js"></script>
+    <script src="tesseract.min.js"></script>
     
     <style>
+        @font-face {
+            font-family: 'Outfit';
+            src: local('Segoe UI'), local('Arial');
+        }
         :root {
             --bg: #020617;
             --glass: rgba(15, 23, 42, 0.75);
@@ -154,7 +157,7 @@
 </div>
 
 <script>
-    pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+    pdfjsLib.GlobalWorkerOptions.workerSrc = "pdf.worker.min.js";
 
     const idFile = document.getElementById('idFile');
     const extractBtn = document.getElementById('extractBtn');
@@ -181,14 +184,22 @@
         try {
             // FASE 0: OCR DE TODOS LOS ARCHIVOS
             const fileDataList = [];
+            
+            // Inicializar Worker de Tesseract localmente para la extensión
+            const worker = await Tesseract.createWorker('spa', 1, {
+                workerPath: chrome.runtime.getURL('tesseract-worker.min.js'),
+                corePath: chrome.runtime.getURL('tesseract-core.wasm.js'),
+            });
+
             for(let i=0; i < uploadedFiles.length; i++) {
                 const file = uploadedFiles[i];
                 status.textContent = `Procesando archivo ${i+1}/${uploadedFiles.length}...`;
                 
                 let img = file.type === 'application/pdf' ? await convertPdfToImage(file) : await processImageFile(file);
-                const ocr = await Tesseract.recognize(img, 'spa');
+                const ocr = await worker.recognize(img);
                 fileDataList.push({ name: file.name, text: ocr.data.text, index: i });
             }
+            await worker.terminate();
 
             // FASE 1: DETECTAR CUÁL ES LA CÉDULA (Mejorado: Robusto + Fallback)
             status.textContent = "Identificando Cédula Colombiana...";
