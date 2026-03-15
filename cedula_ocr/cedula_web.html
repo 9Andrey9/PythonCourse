@@ -122,37 +122,27 @@
     <p class="tagline">Verificación Inteligente de Identidad</p>
 
     <div id="mainUI">
-        <label class="label">1. Documento Identidad (Obligatorio)</label>
+        <label class="label">Carga Inteligente de Documentos</label>
         <div class="upload-container">
-            <label for="idFile" class="upload-area" id="dropZoneID">
-                <p id="idFileName">🪪 Subir Cédula</p>
-                <span>Solo el frente del documento</span>
-                <input type="file" id="idFile" accept="image/*,application/pdf">
+            <label for="idFile" class="upload-area" id="dropZone">
+                <p id="fileNameDisplay">📂 Sube todos tus documentos aquí</p>
+                <span>Cédula + Facturas, Contratos o Certificados</span>
+                <input type="file" id="idFile" accept="image/*,application/pdf" multiple>
             </label>
         </div>
-
-        <label class="label">2. Documentos de Soporte (Opcional)</label>
-        <div class="upload-container">
-            <label for="supportFiles" class="upload-area" id="dropZoneSupport">
-                <p id="supportFileNames">📂 Subir otros archivos</p>
-                <span>Facturas, contratos, certificados...</span>
-                <input type="file" id="supportFiles" accept="image/*,application/pdf" multiple>
-            </label>
-        </div>
-
-        <button id="extractBtn" class="btn">🛡️ Iniciar Verificación</button>
+        <button id="extractBtn" class="btn">🚀 Iniciar Análisis Inteligente</button>
     </div>
 
     <div id="loader">
         <div class="spinner"></div>
-        <p id="status">Iniciando motor híbrido...</p>
+        <p id="status">Iniciando motor inteligente...</p>
     </div>
 
     <div id="results">
         <div id="verdictBadge" style="text-align: center; margin-bottom: 30px; padding: 15px; border-radius: 20px; font-weight: 800; font-size: 1.2rem; display: none;"></div>
         
-        <div class="data-card">
-            <p class="label">Datos del Titular (Extraídos)</p>
+        <div id="idDataCard" class="data-card" style="display: none;">
+            <p class="label">Datos del Titular (Detectado)</p>
             <p id="resFullName" class="value" style="font-size: 1.1rem; margin-bottom: 5px;">—</p>
             <p id="resCC" class="cc-val">—</p>
         </div>
@@ -167,59 +157,83 @@
     pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
 
     const idFile = document.getElementById('idFile');
-    const supportFiles = document.getElementById('supportFiles');
     const extractBtn = document.getElementById('extractBtn');
     const loader = document.getElementById('loader');
     const status = document.getElementById('status');
     const results = document.getElementById('results');
     const mainUI = document.getElementById('mainUI');
     
-    let selectedID = null;
-    let selectedSupport = [];
+    let uploadedFiles = [];
 
     idFile.onchange = (e) => {
-        selectedID = e.target.files[0];
-        if (selectedID) {
-            document.getElementById('idFileName').textContent = `✅ ${selectedID.name}`;
-            checkReady();
+        uploadedFiles = Array.from(e.target.files);
+        if (uploadedFiles.length > 0) {
+            document.getElementById('fileNameDisplay').textContent = `✅ ${uploadedFiles.length} archivos cargados`;
+            extractBtn.style.display = 'block';
         }
     };
-
-    supportFiles.onchange = (e) => {
-        selectedSupport = Array.from(e.target.files);
-        if (selectedSupport.length > 0) {
-            document.getElementById('supportFileNames').textContent = `✅ ${selectedSupport.length} archivos cargados`;
-        }
-    };
-
-    function checkReady() {
-        if (selectedID) extractBtn.style.display = 'block';
-    }
 
     extractBtn.onclick = async () => {
+        if (uploadedFiles.length === 0) return;
         mainUI.style.display = 'none';
         loader.style.display = 'block';
         
         try {
-            // FASE 1: EXTRAER DATOS CÉDULA
-            status.textContent = "Analizando Cédula (Fase 1/2)...";
-            let idImg = selectedID.type === 'application/pdf' ? await convertPdfToImage(selectedID) : await processImageFile(selectedID);
-            
-            const idOCR = await Tesseract.recognize(idImg, 'spa');
-            const idData = await cleanIDData(idOCR.data.text);
-            
-            console.log("Datos Titular:", idData);
+            // FASE 0: OCR DE TODOS LOS ARCHIVOS
+            const fileDataList = [];
+            for(let i=0; i < uploadedFiles.length; i++) {
+                const file = uploadedFiles[i];
+                status.textContent = `Procesando archivo ${i+1}/${uploadedFiles.length}...`;
+                
+                let img = file.type === 'application/pdf' ? await convertPdfToImage(file) : await processImageFile(file);
+                const ocr = await Tesseract.recognize(img, 'spa');
+                fileDataList.push({ name: file.name, text: ocr.data.text, index: i });
+            }
 
-            // FASE 2: VERIFICAR SOPORTES
+            // FASE 1: DETECTAR CUÁL ES LA CÉDULA (Mejorado: Robusto + Fallback)
+            status.textContent = "Identificando Cédula Colombiana...";
+            const detectionPrompt = `Analiza estos documentos OCR y dime cuál es la "Cédula de Ciudadanía Colombiana". 
+            Busca palabras clave como "REPUBLICA DE COLOMBIA", "CEDULA DE CIUDADANIA", "APELLIDOS", "NOMBRES".
+            
+            LISTA:
+            ${fileDataList.map((f, i) => `[ID: ${i}] Archivo: ${f.name} | Texto: ${f.text.substring(0, 500)}`).join('\n')}
+            
+            RESPONDE ÚNICAMENTE EL NÚMERO DEL ID (ej: 0). Si tienes dudas, elige el que más se parezca a una identificación.`;
+            
+            let detectedIDStr = await callAI(detectionPrompt);
+            let idIndex = -1;
+            
+            // Intento 1: Parsing de la IA con Regex
+            const match = detectedIDStr.match(/\d+/);
+            if (match) idIndex = parseInt(match[0]);
+
+            // Intento 2: Heurística manual (Fallback) si la IA falla o el ID es inválido
+            if (idIndex < 0 || idIndex >= fileDataList.length) {
+                console.log("IA falló en detectar ID, usando heurística...");
+                idIndex = fileDataList.findIndex(f => {
+                    const t = f.text.toUpperCase();
+                    return t.includes("REPUBLICA") || t.includes("COLOMBIA") || t.includes("CEDULA") || t.includes("NOMBRES");
+                });
+            }
+            
+            if (idIndex < 0 || idIndex >= fileDataList.length) {
+                throw new Error("No pudimos identificar cuál de los archivos es la Cédula. Asegúrate de que la foto sea clara.");
+            }
+
+            const activeIDText = fileDataList[idIndex].text;
+            
+            // FASE 2: EXTRAER DATOS TITULAR (Reglas de Oro Restituidas)
+            status.textContent = "Extrayendo identidad del titular...";
+            const idData = await cleanIDData(activeIDText);
+            
+            // FASE 3: VERIFICAR EL RESTO DE DOCUMENTOS
             const verifications = [];
-            for (let i = 0; i < selectedSupport.length; i++) {
-                const file = selectedSupport[i];
-                status.textContent = `Verificando Soporte ${i+1}/${selectedSupport.length}...`;
+            for (let i = 0; i < fileDataList.length; i++) {
+                if (i === idIndex) continue; // Saltamos la propia cédula
+                const file = fileDataList[i];
+                status.textContent = `Cruzando datos con ${file.name}...`;
                 
-                let sImg = file.type === 'application/pdf' ? await convertPdfToImage(file) : await processImageFile(file);
-                const sOCR = await Tesseract.recognize(sImg, 'spa');
-                
-                const match = await verifyMatch(idData, sOCR.data.text, file.name);
+                const match = await verifyMatch(idData, file.text, file.name);
                 verifications.push(match);
             }
 
@@ -227,7 +241,7 @@
 
         } catch (err) {
             console.error(err);
-            alert("Error en la verificación. Intenta con imágenes más legibles.");
+            alert("Error: " + err.message);
             location.reload();
         }
     };
@@ -287,6 +301,9 @@
         loader.style.display = 'none';
         results.style.display = 'block';
         
+        // Mostrar card de la cédula detectada
+        const idCard = document.getElementById('idDataCard');
+        idCard.style.display = 'block';
         document.getElementById('resFullName').textContent = `${idData.nombres} ${idData.apellidos}`.toUpperCase();
         document.getElementById('resCC').textContent = formatDots(idData.cedula);
         
@@ -298,7 +315,8 @@
 
         verifications.forEach(v => {
             if (!v.matched) allMatched = false;
-            if (v.matched && v.reason.toLowerCase().includes("duda")) doubts = true;
+            const resLower = v.reason.toLowerCase();
+            if (v.matched && (resLower.includes("duda") || resLower.includes("parcial"))) doubts = true;
 
             const div = document.createElement('div');
             div.className = 'data-card';
@@ -306,15 +324,16 @@
             div.innerHTML = `
                 <p style="font-size: 0.8rem; font-weight: 700; color: ${v.matched ? '#10b981' : '#f87171'}">${v.fileName}</p>
                 <p style="font-size: 0.9rem; margin-top: 5px;">${v.reason}</p>
-                <p style="font-size: 0.75rem; color: var(--dim); margin-top: 4px;">Datos: ${v.dataFound}</p>
+                <p style="font-size: 0.75rem; color: var(--dim); margin-top: 4px;">Encontrado: ${v.dataFound}</p>
             `;
             list.appendChild(div);
         });
 
         const badge = document.getElementById('verdictBadge');
         badge.style.display = 'block';
-        if (selectedSupport.length === 0) {
-            badge.textContent = "ID EXTRAÍDA";
+        
+        if (verifications.length === 0) {
+            badge.textContent = "ID DETECTADA";
             badge.style.background = "rgba(99, 102, 241, 0.2)";
             badge.style.color = "#818cf8";
         } else if (allMatched && !doubts) {
